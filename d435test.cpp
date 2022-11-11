@@ -28,13 +28,9 @@ try
     for (auto &c : cameras)
     {
         auto data = c->update();
-        for (auto row : data)
-        {
-            for (auto x : row)
-            {
-                std::cout << x << ",";
-            }
-            std::cout << std::endl;
+        auto vertices=data.get_vertices();
+        for(int i=0;i<data.size();i++){
+            std::cout<<vertices[i].x<<","<<vertices[i].y<<","<<vertices[i].z<<std::endl;
         }
         delete c;
     }

@@ -6,7 +6,7 @@
 class D435{
     public:
         D435(const std::string);
-        std::vector<std::vector<float>> update();
+        rs2::points update();
         std::string get_number();
     private:
         rs2::pipeline p;

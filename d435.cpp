@@ -9,26 +9,23 @@ D435::D435(const std::string number)
     p.start(conf);
 }
 
-std::vector<std::vector<float>> D435::update()
+rs2::points D435::update()
 {
     std::vector<std::vector<float>> data;
 
     rs2::frameset frames = p.wait_for_frames();
+
+    auto color = frames.get_color_frame();
+    if (!color)
+        color = frames.get_infrared_frame();
+    
+    rs2::pointcloud pc;
+    pc.map_to(color);
+
     rs2::depth_frame depth = frames.get_depth_frame();
-
-    int width = depth.get_width();
-    int height = depth.get_height();
-
-    for (int i = 0; i < height; i++)
-    {
-        std::vector<float> row={};
-        for (int j = 0; j < width; j++)
-        {
-            row.push_back(depth.get_distance(j, i));
-        }
-        data.push_back(row);
-    }
-    return data;
+    rs2::points points = pc.calculate(depth);
+    
+    return points;
 }
 
 std::string D435::get_number(){
