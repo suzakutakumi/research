@@ -32,3 +32,15 @@
 *.app
 
 .vscode/
+
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+map_all_angles
+*.pcd

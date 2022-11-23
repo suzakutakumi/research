@@ -1,5 +1,6 @@
 #include <iostream>
 #include "d435.hpp"
+#include "PointCloud.hpp"
 
 enum Direction
 {
@@ -25,14 +26,33 @@ try
         cameras[i] = new D435(serial_numbers[i]);
     }
 
+    int i=0;
     for (auto &c : cameras)
     {
-        auto data = c->update();
-        auto vertices=data.get_vertices();
-        for(int i=0;i<data.size();i++){
-            std::cout<<vertices[i].x<<","<<vertices[i].y<<","<<vertices[i].z<<std::endl;
+        c->update();
+     
+        auto points=c->get_points();
+        auto color=c->get_color();
+        PointCloud pc(points,color);
+     
+        std::string name;
+        switch(i){
+            case Direction::Front:
+                name="front";
+                break;
+            case Direction::Back:
+                name="back";
+                break;
+            case Direction::Right:
+                name="right";
+                break;
+            case Direction::Left:
+                name="left";
+                break;
         }
+        pc.save_to_pcd(name);
         delete c;
+        i++;
     }
 
     return EXIT_SUCCESS;
