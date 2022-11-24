@@ -13,12 +13,12 @@ enum Direction
 int main(int argc, char *argv[])
 try
 {
-    constexpr int num_of_device = 4;
+    constexpr int num_of_device = 1;
     const std::string serial_numbers[num_of_device] = {
-        "102422073987",
-        "102422070478",
-        "102122072472",
-        "102422071935"};
+        "102422073987"};
+        // ,"102422070478"
+        // ,"102122072472"
+        // ,"102422071935"};
     D435 *cameras[num_of_device];
     
     for (int i = 0; i < num_of_device; i++)
