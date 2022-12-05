@@ -1,4 +1,8 @@
 #include "PointCloud.hpp"
+PointCloud::PointCloud()
+{
+    cloud = pc_ptr(new pc);
+}
 PointCloud::PointCloud(const rs2::points &points, const rs2::video_frame &color)
 {
     cloud = pc_ptr(new pc);
@@ -59,7 +63,7 @@ std::tuple<int, int, int> PointCloud::RGB_Texture(rs2::video_frame texture, rs2:
     return std::tuple<int, int, int>(NT1, NT2, NT3);
 }
 
-void PointCloud::save_to_pcd(const std::string &n)
+void PointCloud::save_to_pcd(const std::string &n) const
 {
     std::string name = n;
 
@@ -70,11 +74,35 @@ void PointCloud::save_to_pcd(const std::string &n)
         name = name + std::string(".pcd");
     }
 
-    // pcl::PassThrough<pcl::PointXYZRGB> Cloud_Filter; // Create the filtering object
-    // Cloud_Filter.setInputCloud(cloud);               // Input generated cloud to filter
-    // Cloud_Filter.setFilterFieldName("z");            // Set field name to Z-coordinate
-    // Cloud_Filter.setFilterLimits(0.0, 1.0);          // Set accepted interval values
-    // Cloud_Filter.filter(newCloud);                   // Filtered Cloud Outputted
+    pcl::PassThrough<pcl::PointXYZRGB> Cloud_Filter; // Create the filtering object
+    Cloud_Filter.setInputCloud(cloud);               // Input generated cloud to filter
+    Cloud_Filter.setFilterFieldName("z");            // Set field name to Z-coordinate
+    Cloud_Filter.setFilterLimits(-2.0, 2.0);          // Set accepted interval values
+    Cloud_Filter.filter(newCloud);                   // Filtered Cloud Outputted
 
-    pcl::io::savePCDFileBinary(name, *cloud);
+    pcl::io::savePCDFileBinary(name, newCloud);
+}
+
+void PointCloud::filter(void (*filter_func)(pcl::PointXYZRGB &))
+{
+    for (auto &p : cloud->points)
+    {
+        filter_func(p);
+    }
+}
+
+void PointCloud::filter(pcl::PointXYZRGB &(*filter_func)(const pcl::PointXYZRGB &))
+{
+    for (auto &p : cloud->points)
+    {
+        p = filter_func(p);
+    }
+}
+
+PointCloud PointCloud::extended(const PointCloud &other)
+{
+    auto &p1 = *cloud;
+    auto p2 = other.get_cloud();
+    p1.insert(p1.end(), p2.begin(), p2.end());
+    return *this;
 }

@@ -29,17 +29,18 @@ try
         cameras[i] = new D435(serial_numbers[i]);
     }
 
-    PointCloud *pcs[4];
+    PointCloud pcs[4];
     for (int i = 0; i < num_of_using_device; i++)
     {
         cameras[i]->update();
 
         auto points = cameras[i]->get_points();
         auto color = cameras[i]->get_color();
-        pcs[i] = new PointCloud(points, color);
+        pcs[i] = PointCloud(points, color);
         delete cameras[i];
     }
 
+    PointCloud merged;
     for (int i = 0; i < num_of_using_device; i++)
     {
         std::string name;
@@ -47,20 +48,44 @@ try
         {
         case Direction::Front:
             name = "front";
+            pcs[i].filter([](pcl::PointXYZRGB &p)
+                          { p.z += 0.045; });
             break;
         case Direction::Back:
             name = "back";
+            pcs[i].filter([](pcl::PointXYZRGB &p)
+                          {
+                p.x=-p.x;
+                p.z=-p.z;
+                p.z-=0.045; });
             break;
         case Direction::Right:
             name = "right";
+            pcs[i].filter([](pcl::PointXYZRGB &p)
+                          {
+                float x=p.x;
+                p.x=p.z;
+                p.z=-x;
+                p.x+=0.045; });
             break;
         case Direction::Left:
             name = "left";
+            pcs[i].filter([](pcl::PointXYZRGB &p)
+                          {
+                float x=p.x;
+                p.x=-p.z;
+                p.z=x;
+                p.x-=0.045; });
             break;
         }
-        pcs[i]->save_to_pcd(name);
+        merged.extended(pcs[i]);
+
+        pcs[i].save_to_pcd(name);
         std::cout << name + ".pcd is saved" << std::endl;
     }
+
+    merged.save_to_pcd("merged");
+
     return EXIT_SUCCESS;
 }
 catch (const rs2::error &e)
