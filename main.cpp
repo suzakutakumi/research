@@ -19,9 +19,11 @@ try
     D435 *cameras[num_of_device];
 
     int num_of_using_device = num_of_device;
+    std::string name_end = "";
     if (argc >= 2)
     {
-        num_of_using_device = std::atoi(argv[1]);
+        // num_of_using_device = std::atoi(argv[1]);
+        name_end = argv[1];
     }
 
     for (int i = 0; i < num_of_using_device; i++)
@@ -30,6 +32,15 @@ try
     }
 
     PointCloud pcs[4];
+    // while (true)
+    // {
+    //     auto t = clock();
+    //     for (int i = 0; i < 4; i++)
+    //     {
+    //         cameras[i]->update();
+    //     }
+    //     std::cout << (double)(clock() - t) / CLOCKS_PER_SEC << "s" << std::endl;
+    // }
     for (int i = 0; i < num_of_using_device; i++)
     {
         cameras[i]->update();
@@ -80,8 +91,8 @@ try
         }
         merged.extended(pcs[i]);
 
-        pcs[i].save_to_pcd(name);
-        std::cout << name + ".pcd is saved" << std::endl;
+        pcs[i].save_to_pcd(name + name_end);
+        std::cout << name + name_end + ".pcd is saved" << std::endl;
     }
 
     merged.save_to_pcd("merged");

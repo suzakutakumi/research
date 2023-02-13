@@ -17,11 +17,6 @@ void D435::update()
 {
     std::vector<std::vector<float>> data;
 
-    for (int i = 0; i < 30; i++)
-    {
-        auto frames = p.wait_for_frames(); // Drop several frames for auto-exposure
-    }
-
     rs2::frameset frames = p.wait_for_frames();
 
     rs2::align align(RS2_STREAM_COLOR);

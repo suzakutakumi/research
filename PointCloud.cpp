@@ -80,7 +80,7 @@ void PointCloud::save_to_pcd(const std::string &n) const
     Cloud_Filter.setFilterLimits(-2.0, 2.0);          // Set accepted interval values
     Cloud_Filter.filter(newCloud);                   // Filtered Cloud Outputted
 
-    pcl::io::savePCDFileBinary(name, newCloud);
+    pcl::io::savePCDFileBinary(name, *cloud);
 }
 
 void PointCloud::filter(void (*filter_func)(pcl::PointXYZRGB &))
