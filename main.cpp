@@ -32,71 +32,68 @@ try
     }
 
     PointCloud pcs[4];
-    // while (true)
-    // {
-    //     auto t = clock();
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         cameras[i]->update();
-    //     }
-    //     std::cout << (double)(clock() - t) / CLOCKS_PER_SEC << "s" << std::endl;
-    // }
-    for (int i = 0; i < num_of_using_device; i++)
+    while (true)
     {
-        cameras[i]->update();
-
-        auto points = cameras[i]->get_points();
-        auto color = cameras[i]->get_color();
-        pcs[i] = PointCloud(points, color);
-        delete cameras[i];
-    }
-
-    PointCloud merged;
-    for (int i = 0; i < num_of_using_device; i++)
-    {
-        std::string name;
-        switch (i)
+        for (int i = 0; i < num_of_using_device; i++)
         {
-        case Direction::Front:
-            name = "front";
-            pcs[i].filter([](pcl::PointXYZRGB &p)
-                          { p.z += 0.045; });
-            break;
-        case Direction::Back:
-            name = "back";
-            pcs[i].filter([](pcl::PointXYZRGB &p)
-                          {
+            cameras[i]->update();
+
+            auto points = cameras[i]->get_points();
+            auto color = cameras[i]->get_color();
+
+            pcs[i] = PointCloud(points, color);
+
+            std::string name;
+            switch (i)
+            {
+            case Direction::Front:
+                name = "front";
+                pcs[i].filter([](pcl::PointXYZRGB &p)
+                              { p.z += 0.080; });
+                break;
+            case Direction::Back:
+                name = "back";
+                pcs[i].filter([](pcl::PointXYZRGB &p)
+                              {
                 p.x=-p.x;
                 p.z=-p.z;
-                p.z-=0.045; });
-            break;
-        case Direction::Right:
-            name = "right";
-            pcs[i].filter([](pcl::PointXYZRGB &p)
-                          {
+                p.z-=0.080; });
+                break;
+            case Direction::Right:
+                name = "right";
+                pcs[i].filter([](pcl::PointXYZRGB &p)
+                              {
                 float x=p.x;
                 p.x=p.z;
                 p.z=-x;
-                p.x+=0.045; });
-            break;
-        case Direction::Left:
-            name = "left";
-            pcs[i].filter([](pcl::PointXYZRGB &p)
-                          {
+                p.x+=0.080; });
+                break;
+            case Direction::Left:
+                name = "left";
+                pcs[i].filter([](pcl::PointXYZRGB &p)
+                              {
                 float x=p.x;
                 p.x=-p.z;
                 p.z=x;
-                p.x-=0.045; });
-            break;
+                p.x-=0.080; });
+                break;
+            }
+
+            pcs[i].save_to_pcd(name + name_end);
+            std::cout << name + name_end + ".pcd is saved" << std::endl;
         }
-        merged.extended(pcs[i]);
 
-        pcs[i].save_to_pcd(name + name_end);
-        std::cout << name + name_end + ".pcd is saved" << std::endl;
+        PointCloud merged;
+        for (auto &p : pcs)
+        {
+            merged.extended(p);
+        }
+
+        merged.save_to_pcd("pcd/merged" + name_end);
+        std::cout << "merged" + name_end + ".pcd is saved" << std::endl;
+        break;
     }
-
-    merged.save_to_pcd("merged");
-
+    std::cout << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
 catch (const rs2::error &e)

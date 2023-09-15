@@ -15,8 +15,6 @@ D435::D435(const std::string number)
 
 void D435::update()
 {
-    std::vector<std::vector<float>> data;
-
     rs2::frameset frames = p.wait_for_frames();
 
     rs2::align align(RS2_STREAM_COLOR);

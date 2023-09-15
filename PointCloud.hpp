@@ -25,15 +25,16 @@
 class PointCloud
 {
 public:
-    using pc=pcl::PointCloud<pcl::PointXYZRGB>;
+    using pc = pcl::PointCloud<pcl::PointXYZRGB>;
     using pc_ptr = pc::Ptr;
     PointCloud();
     PointCloud(const rs2::points &, const rs2::video_frame &);
-    void save_to_pcd(const std::string&) const;
-    pc get_cloud() const {return *cloud;}
-    void filter(void (*func)(pcl::PointXYZRGB&));
-    void filter(pcl::PointXYZRGB& (*func)(const pcl::PointXYZRGB&));
-    PointCloud extended(const PointCloud&);
+    void save_to_pcd(const std::string &) const;
+    pc_ptr get_cloud() const { return cloud; }
+    void filter(void (*func)(pcl::PointXYZRGB &));
+    void filter(pcl::PointXYZRGB &(*func)(const pcl::PointXYZRGB &));
+    PointCloud extended(const PointCloud &);
+
 private:
     static std::tuple<int, int, int> RGB_Texture(rs2::video_frame texture, rs2::texture_coordinate Texture_XY);
     pc_ptr cloud;

@@ -67,8 +67,6 @@ void PointCloud::save_to_pcd(const std::string &n) const
 {
     std::string name = n;
 
-    pcl::PointCloud<pcl::PointXYZRGB> newCloud;
-
     if (name.size() <= 4 || name.substr(name.size() - 4) != ".pcd")
     {
         name = name + std::string(".pcd");
@@ -77,8 +75,14 @@ void PointCloud::save_to_pcd(const std::string &n) const
     pcl::PassThrough<pcl::PointXYZRGB> Cloud_Filter; // Create the filtering object
     Cloud_Filter.setInputCloud(cloud);               // Input generated cloud to filter
     Cloud_Filter.setFilterFieldName("z");            // Set field name to Z-coordinate
-    Cloud_Filter.setFilterLimits(-2.0, 2.0);          // Set accepted interval values
-    Cloud_Filter.filter(newCloud);                   // Filtered Cloud Outputted
+    Cloud_Filter.setFilterLimits(-3.0, 3.0);         // Set accepted interval values
+    Cloud_Filter.filter(*cloud);                     // Filtered Cloud Outputted
+
+    pcl::PassThrough<pcl::PointXYZRGB> Cloud_Filter2; // Create the filtering object
+    Cloud_Filter2.setInputCloud(cloud);               // Input generated cloud to filter
+    Cloud_Filter2.setFilterFieldName("x");            // Set field name to Z-coordinate
+    Cloud_Filter2.setFilterLimits(-3.0, 3.0);         // Set accepted interval values
+    Cloud_Filter2.filter(*cloud);                     // Filtered Cloud Outputted
 
     pcl::io::savePCDFileBinary(name, *cloud);
 }
@@ -103,6 +107,6 @@ PointCloud PointCloud::extended(const PointCloud &other)
 {
     auto &p1 = *cloud;
     auto p2 = other.get_cloud();
-    p1.insert(p1.end(), p2.begin(), p2.end());
+    p1.insert(p1.end(), p2->begin(), p2->end());
     return *this;
 }
