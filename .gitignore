@@ -44,3 +44,4 @@ install_manifest.txt
 
 map_all_angles
 *.pcd
+pcd/
